@@ -1,1 +1,103 @@
+#include <iostream> 
+
+using namespace std; 
+
+struct TCentroMaestro {
+    int idCentro;
+    float stockPlastico;
+    float stockVidrio;
+    float stockCarton;
+};
+
+struct TEntregaNovedad {
+    int idCentro;     
+    char tipoMaterial; 
+    float peso;      
+};
+
+void elegirOpcion();
+
+void cargarYValidarEntregas();
+
+void actualizarStockSemanal();
+
+void MostrarEstadisticas();
+
+int ingresarEntero(int min, int max = 0, bool controlarMax = false);
+
+int main() {
+	TCentroMaestro maestroA[100] = {
+        {101, 0.0, 0.0, 0.0},
+        {102, 0.0, 0.0, 0.0},
+        {103, 0.0, 0.0, 0.0},
+        {104, 0.0, 0.0, 0.0},
+        {105, 0.0, 0.0, 0.0},
+        {106, 0.0, 0.0, 0.0},
+        {107, 0.0, 0.0, 0.0},
+        {110, 0.0, 0.0, 0.0}
+    };
+    
+    int totalCentros = 8;
+	cout << "Bienvenido al sistema de gestion logistica de los Puntos Verdes" << endl;
+	cout << "Que desea realizar?" << endl;
+	do{
+	int decision = elegirOpcion();
+		
+		switch(decision){
+			case 1:
+				cargarYValidarEntregas();
+				break;
+				
+			case 2:
+				actualizarStockSemanal();
+				break;
+				
+			case 3:
+				MostrarEstadisticas();
+				break;
+		}
+		
+	while(decision != 4);
+    return 0;
+}
+
+int elegirOpcion(){	
+	cout << "1) Cargar y Validar Entregas"<< endl;
+	cout << "2) Actualizar Stock Semanal"<< endl;
+	cout << "3) Mostrar Estadísticas"<< endl;
+	cout << "4) Salir del sistema"<< endl;
+	int opcion = ingresarEntero(1, 4, true);
+	return opcion;
+}
+
+void cargarYValidarEntregas(){
+	TEntregaNovedad 
+}
+
+void actualizarStockSemanal(){
+	
+}
+
+void MostrarEstadisticas(){
+	
+}
+
+int ingresarEntero(int min, int max = 0, bool controlarMax = false) {
+    int valor;
+    bool esValido;
+    do {
+        cin >> valor;
+        
+        esValido = (valor >= min) && (!controlarMax || valor <= max);
+        
+        if (!esValido) {
+            cout << "Error. Ingrese un valor valido" << endl;
+        }
+    } while (!esValido);
+    
+    return valor;
+}
+
+
+
 
