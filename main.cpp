@@ -1,0 +1,228 @@
+#include <iostream>
+
+using namespace std;
+
+struct TCentroMaestro
+{
+    int idCentro;
+    float stockPlastico;
+    float stockVidrio;
+    float stockCarton;
+};
+
+struct TEntregaDiaria
+{
+    int idCentro;
+    char tipoMaterial;
+    float peso;
+};
+
+int elegirOpcion();
+void cargarYValidarEntregas(TCentroMaestro maestro[], int cantCentros, TEntregaDiaria novedad[], int &cantNovedades);
+bool existeId(TCentroMaestro maestro[], int cantCentros, int idIngresado);
+int ingresarEntero(int min, int max = 0, bool controlarMax = false);
+
+void actualizarStockSemanal(TCentroMaestro maestro[], int cantcentros, TEntregaDiaria novedad[], int cantMaestro, int cantNovedades);
+void MostrarEstadisticas();
+int main()
+{
+    TCentroMaestro maestroA[100] = {
+        {101, 0.0, 0.0, 0.0},
+        {102, 0.0, 0.0, 0.0},
+        {103, 0.0, 0.0, 0.0},
+        {104, 0.0, 0.0, 0.0},
+        {105, 0.0, 0.0, 0.0},
+        {106, 0.0, 0.0, 0.0},
+        {107, 0.0, 0.0, 0.0},
+        {110, 0.0, 0.0, 0.0}};
+    int cantCentros = 8;
+
+    TEntregaDiaria novedadesB[50];
+    int cantNovedades = 0;
+
+    int decision;
+    cout << "Bienvenido al sistema de gestion logistica de los Puntos Verdes" << endl;
+
+    do
+    {
+        decision = elegirOpcion();
+
+        switch (decision)
+        {
+        case 1:
+            cargarYValidarEntregas(maestroA, cantCentros, novedadesB, cantNovedades);
+            break;
+
+        case 2:
+            actualizarStockSemanal(maestroA, cantCentros, novedadesB, cantNovedades);
+            break;
+
+        case 3:
+            MostrarEstadisticas();
+            break;
+
+        case 4:
+            cout << "Saliendo del sistema de gestion." << endl;
+            break;
+        }
+    } while (decision != 4);
+
+    return 0;
+}
+
+int elegirOpcion()
+{
+    cout << "1) Cargar y Validar Entregas" << endl;
+    cout << "2) Actualizar Stock Semanal" << endl;
+    cout << "3) Mostrar Estadisticas" << endl;
+    cout << "4) Salir del sistema" << endl;
+    cout << "Seleccione una opcion: ";
+    int opcion = ingresarEntero(1, 4, true);
+    return opcion;
+}
+
+void cargarYValidarEntregas(TCentroMaestro maestro[], int cantCentros, TEntregaDiaria novedad[], int &cantNovedades)
+{
+    int id;
+    cantNovedades = 0;
+    do
+    {
+        cout << "Ingrese ID de Centro (0 para finalizar la carga): ";
+        cin >> id;
+
+        if (id != 0)
+        {
+            if (existeId(maestro, cantCentros, id))
+            {
+
+                novedad[cantNovedades].idCentro = id;
+
+                char mat;
+                do
+                {
+                    cout << "Ingrese Tipo de Material ('P'=Plastico, 'V'=Vidrio, 'C'=Carton): ";
+                    cin >> mat;
+                    mat = toupper(mat);
+                    if (mat != 'P' && mat != 'V' && mat != 'C')
+                    {
+                        cout << "Material invalido. Pruebe otra vez." << endl;
+                    }
+                } while (mat != 'P' && mat != 'V' && mat != 'C');
+                novedad[cantNovedades].tipoMaterial = mat;
+
+                cout << "Ingrese Peso (kg): ";
+                cin >> novedad[cantNovedades].peso;
+
+                cantNovedades++;
+            }
+            else
+            {
+                cout << "Error: El ID de Centro " << id << " no existe en la base maestra." << endl;
+            }
+        }
+    } while (id != 0 && cantNovedades < 50);
+
+    if (cantNovedades > 0)
+    {
+
+        int i = 0;
+        while (i < cantNovedades)
+        {
+            int idActual = novedad[i].idCentro;
+            float totalKgCentro = 0.0;
+
+            cout << "Centro ID: " << idActual << endl;
+
+            while (i < cantNovedades && novedad[i].idCentro == idActual)
+            {
+                cout << "Material: " << novedad[i].tipoMaterial
+                     << " | Peso: " << novedad[i].peso << " kg" << endl;
+
+                totalKgCentro += novedad[i].peso;
+                i++;
+            }
+
+            cout << "Total acumulado por Centro " << idActual << ": " << totalKgCentro << " kg" << endl;
+        }
+    }
+    else
+    {
+        cout << "No se ingresaron novedades" << endl;
+    }
+}
+
+bool existeId(TCentroMaestro maestro[], int cantCentros, int idIngresado)
+{
+    int fin = cantCentros - 1;
+
+    for (int inicio = 0; inicio <= fin;)
+    {
+        int medio = inicio + (fin - inicio) / 2;
+
+        if (maestro[medio].idCentro == idIngresado)
+            return true;
+
+        if (maestro[medio].idCentro < idIngresado)
+            inicio = medio + 1;
+        else
+            fin = medio - 1;
+    }
+    return false;
+}
+
+int ingresarEntero(int min, int max, bool controlarMax)
+{
+    int valor;
+    bool esValido;
+    do
+    {
+        cin >> valor;
+
+        esValido = (valor >= min) && (!controlarMax || valor <= max);
+
+        if (!esValido)
+        {
+            cout << "Error. Ingrese un valor valido: ";
+        }
+    } while (!esValido);
+
+    return valor;
+}
+
+void actualizarStockSemanal(TCentroMaestro maestro[], int cantCentros, TEntregaDiaria novedad[], int cantNovedades)
+{
+    int i = 0;
+    int j = 0;
+
+    while (i < cantCentros && j < cantNovedades)
+    {
+        if (maestro[i].idCentro == novedad[j].idCentro)
+        {
+            if (novedad[j].tipoMaterial == 'V')
+            {
+                maestro[i].stockVidrio = maestro[i].stockVidrio + novedad[j].peso;
+            }
+            else if (novedad[j].tipoMaterial == 'P')
+            {
+                maestro[i].stockPlastico = maestro[i].stockPlastico + novedad[j].peso;
+            }
+            else if (novedad[j].tipoMaterial == 'C')
+            {
+                maestro[i].stockCarton = maestro[i].stockCarton + novedad[j].peso;
+            }
+            j++; // se avanza solo en novedades, por si el mismo centro tiene más entregas pendientes de procesar
+        }
+        else if (maestro[i].idCentro < novedad[j].idCentro)
+        {
+            i++;
+        }
+        else if (maestro[i].idCentro > novedad[j].idCentro)
+        {
+            j++;
+        }
+    }
+}
+
+void MostrarEstadisticas()
+{
+}
