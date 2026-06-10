@@ -194,6 +194,7 @@ void actualizarStockSemanal(TCentroMaestro maestro[], int cantCentros, TEntregaD
     int i = 0;
     int j = 0;
 
+    // se recorre ambas estructuras en paralelo, ya que ambas estan ordenadas por idCentro
     while (i < cantCentros && j < cantNovedades)
     {
         if (maestro[i].idCentro == novedad[j].idCentro)
@@ -223,6 +224,6 @@ void actualizarStockSemanal(TCentroMaestro maestro[], int cantCentros, TEntregaD
     }
 }
 
-void MostrarEstadisticas()
+void MostrarEstadisticas(TCentroMaestro maestro[], int cantCentros)
 {
 }
