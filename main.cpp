@@ -5,6 +5,7 @@ using namespace std;
 struct TCentroMaestro
 {
     int idCentro;
+    char nombre[50];
     float stockPlastico;
     float stockVidrio;
     float stockCarton;
@@ -17,28 +18,38 @@ struct TEntregaDiaria
     float peso;
 };
 
+void inicializarMaestro(TCentroMaestro maestro[]){
+	maestro[0] = {101, "Centro A", 0.0, 0.0, 0.0};
+	maestro[1] = {102, "Centro B", 0.0, 0.0, 0.0};
+	maestro[2] = {103, "Centro C", 0.0, 0.0, 0.0};
+	maestro[3] = {104, "Centro D", 0.0, 0.0, 0.0};
+	maestro[4] = {105, "Centro E", 0.0, 0.0, 0.0};
+	maestro[5] = {106, "Centro F", 0.0, 0.0, 0.0};
+	maestro[6] = {107, "Centro G", 0.0, 0.0, 0.0};
+	maestro[7] = {110, "Centro H", 0.0, 0.0, 0.0};	
+}
+
 int elegirOpcion();
+void inicializarMaestro(TCentroMaestro maestro[]);
 void cargarYValidarEntregas(TCentroMaestro maestro[], int cantCentros, TEntregaDiaria novedad[], int &cantNovedades);
 bool existeId(TCentroMaestro maestro[], int cantCentros, int idIngresado);
 int ingresarEntero(int min, int max = 0, bool controlarMax = false);
+void actualizarStockSemanal(TCentroMaestro maestro[], int cantCentros, TEntregaDiaria novedad[], int cantNovedades);
+void MostrarEstadisticas(TCentroMaestro maestro[], int cantCentros);
+void totalGeneralDeKg(TCentroMaestro maestro[], int cantCentros, float &contKgTotal);
+void centroConMayorVolumen(TCentroMaestro maestro[], int cantCentros);
+void porcentajeDeCadaTipo(TCentroMaestro maestro[], int cantCentros, float contKgTotal);
 
-void actualizarStockSemanal(TCentroMaestro maestro[], int cantcentros, TEntregaDiaria novedad[], int cantMaestro, int cantNovedades);
-void MostrarEstadisticas();
+
 int main()
 {
-    TCentroMaestro maestroA[100] = {
-        {101, 0.0, 0.0, 0.0},
-        {102, 0.0, 0.0, 0.0},
-        {103, 0.0, 0.0, 0.0},
-        {104, 0.0, 0.0, 0.0},
-        {105, 0.0, 0.0, 0.0},
-        {106, 0.0, 0.0, 0.0},
-        {107, 0.0, 0.0, 0.0},
-        {110, 0.0, 0.0, 0.0}};
+    TCentroMaestro maestroA[100];
     int cantCentros = 8;
 
     TEntregaDiaria novedadesB[50];
     int cantNovedades = 0;
+    
+    inicializarMaestro(maestroA);
 
     int decision;
     cout << "Bienvenido al sistema de gestion logistica de los Puntos Verdes" << endl;
@@ -58,7 +69,7 @@ int main()
             break;
 
         case 3:
-            MostrarEstadisticas();
+            MostrarEstadisticas (maestroA, cantCentros);
             break;
 
         case 4:
@@ -193,7 +204,6 @@ void actualizarStockSemanal(TCentroMaestro maestro[], int cantCentros, TEntregaD
 {
     int i = 0;
     int j = 0;
-
     // se recorre ambas estructuras en paralelo, ya que ambas estan ordenadas por idCentro
     while (i < cantCentros && j < cantNovedades)
     {
@@ -226,4 +236,54 @@ void actualizarStockSemanal(TCentroMaestro maestro[], int cantCentros, TEntregaD
 
 void MostrarEstadisticas(TCentroMaestro maestro[], int cantCentros)
 {
+    cout << "Estadisticas del Sistema:" << endl;
+    
+    float contKgTotal = 0.0;
+    totalGeneralDeKg(maestro, cantCentros, contKgTotal);
+    cout << "Total general de kilogramos en el sistema: " << contKgTotal << "kg." << endl;
+    
+    centroConMayorVolumen(maestro, cantCentros);
+    porcentajeDeCadaTipo(maestro, cantCentros, contKgTotal);
+}
+
+void totalGeneralDeKg(TCentroMaestro maestro[], int cantCentros, float &contKgTotal)
+{
+    contKgTotal = 0;
+
+    for(int i = 0; i < cantCentros; i++)
+    {
+        contKgTotal += maestro[i].stockPlastico;
+        contKgTotal += maestro[i].stockVidrio;
+        contKgTotal += maestro[i].stockCarton;
+    }
+}
+
+void centroConMayorVolumen(TCentroMaestro maestro[], int cantCentros){
+	float contKgAcumulados = 0;
+	float mayor = 0;
+	int indiceMayor = 0;
+		for (int i = 0; i < cantCentros; i++){
+			contKgAcumulados = maestro[i].stockPlastico + maestro[i].stockCarton + maestro[i].stockVidrio;
+			if (contKgAcumulados > mayor){
+				mayor = contKgAcumulados;
+				indiceMayor = i;	
+			}
+		}
+	cout << "Nombre del Centro con mayor volumen de carga acumulada: " << maestro[indiceMayor].nombre << ". Acumula " << mayor << "kg." << endl;
+}
+
+void porcentajeDeCadaTipo(TCentroMaestro maestro[], int cantCentros, float contKgTotal)
+{
+    float totalP = 0.0, totalV = 0.0, totalC = 0.0;
+
+    for(int i = 0; i < cantCentros; i++)
+    {
+        totalP += maestro[i].stockPlastico;
+        totalV += maestro[i].stockVidrio;
+        totalC += maestro[i].stockCarton;
+    }
+    cout << "Porcentaje de cada tipo de material:" << endl;
+    cout << "Plastico: " << (totalP / contKgTotal) * 100 << "%" << endl;
+    cout << "Vidrio: " << (totalV / contKgTotal) * 100 << "%" << endl;
+    cout << "Carton: " << (totalC / contKgTotal) * 100 << "%" << endl;
 }
